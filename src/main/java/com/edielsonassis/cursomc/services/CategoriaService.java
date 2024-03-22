@@ -17,9 +17,10 @@ public class CategoriaService {
     private final CategoriaRepository repository;
 
     public Categoria findById(Integer id) {
-        return repository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Categoria não encontrada"));
+        return repository.findById(id).orElseThrow(() -> new ObjectNotFoundException(
+                "Objeto não encontrado! Id: " + id + ", Tipo: " + Categoria.class.getSimpleName()));
     }
-    
+
     public List<Categoria> findAll() {
         return repository.findAll();
     }
