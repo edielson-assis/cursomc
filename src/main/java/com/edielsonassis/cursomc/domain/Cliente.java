@@ -40,6 +40,10 @@ public class Cliente implements Serializable {
     @CollectionTable(name = "telefone")
     private final Set<String> telefones = new HashSet<>();
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "cliente")
+    private final List<Pedido> pedidos = new ArrayList<>();
+
     public Cliente(Integer id, String nome, String email, String cpfOuCnpj, TipoCliente tipo) {
         this.id = id;
         this.nome = nome;

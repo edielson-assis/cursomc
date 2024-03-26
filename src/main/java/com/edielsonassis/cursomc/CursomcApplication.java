@@ -1,5 +1,6 @@
 package com.edielsonassis.cursomc;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.boot.CommandLineRunner;
@@ -11,13 +12,20 @@ import com.edielsonassis.cursomc.domain.Cidade;
 import com.edielsonassis.cursomc.domain.Cliente;
 import com.edielsonassis.cursomc.domain.Endereco;
 import com.edielsonassis.cursomc.domain.Estado;
+import com.edielsonassis.cursomc.domain.Pagamento;
+import com.edielsonassis.cursomc.domain.PagamentoComBoleto;
+import com.edielsonassis.cursomc.domain.PagamentoComCartao;
+import com.edielsonassis.cursomc.domain.Pedido;
 import com.edielsonassis.cursomc.domain.Produto;
+import com.edielsonassis.cursomc.domain.enums.EstadoPagamento;
 import com.edielsonassis.cursomc.domain.enums.TipoCliente;
 import com.edielsonassis.cursomc.repositories.CategoriaRepository;
 import com.edielsonassis.cursomc.repositories.CidadeRepository;
 import com.edielsonassis.cursomc.repositories.ClienteRepository;
 import com.edielsonassis.cursomc.repositories.EnderecoRepository;
 import com.edielsonassis.cursomc.repositories.EstadoRepository;
+import com.edielsonassis.cursomc.repositories.PagamentoRepository;
+import com.edielsonassis.cursomc.repositories.PedidoRepository;
 import com.edielsonassis.cursomc.repositories.ProdutoRepository;
 
 import lombok.AllArgsConstructor;
@@ -32,6 +40,8 @@ public class CursomcApplication implements CommandLineRunner {
 	private final CidadeRepository cidadeRepository;
 	private final EnderecoRepository enderecoRepository;
 	private final ClienteRepository clienteRepository;
+	private final PagamentoRepository pagamentoRepository;
+	private final PedidoRepository pedidoRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -71,7 +81,6 @@ public class CursomcApplication implements CommandLineRunner {
 		cidadeRepository.saveAll(Arrays.asList(cidade1, cidade2, cidade3));
 
 		Cliente cliente1 = new Cliente(null, "Maria Silva", "maria@gmail.com", "36378912377", TipoCliente.PESSOAFISICA);
-
 		cliente1.getTelefones().addAll(Arrays.asList("27363323", "93838393"));
 
 		Endereco endereco1 = new Endereco(null, "Rua Flores", "300", "Apto 203", "Jardim", "38220834", cidade1, cliente1);
@@ -81,5 +90,21 @@ public class CursomcApplication implements CommandLineRunner {
 
 		clienteRepository.save(cliente1);
 		enderecoRepository.saveAll(Arrays.asList(endereco1, endereco2));
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+
+		Pedido pedido1 = new Pedido(null, sdf.parse("30/09/2017 10:32"), cliente1, endereco1);
+		Pedido pedido2 = new Pedido(null, sdf.parse("10/10/2017 19:35"), cliente1, endereco2);
+		
+		cliente1.getPedidos().addAll(Arrays.asList(pedido1, pedido2));
+		
+		Pagamento pagamento1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, pedido1, 6);
+		pedido1.setPagamento(pagamento1);
+		
+		Pagamento pagamento2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, pedido2, sdf.parse("20/10/2017 00:00"), null);
+		pedido2.setPagamento(pagamento2);
+		
+		pedidoRepository.saveAll(Arrays.asList(pedido1, pedido2));
+		pagamentoRepository.saveAll(Arrays.asList(pagamento1, pagamento2));
 	}
 }
